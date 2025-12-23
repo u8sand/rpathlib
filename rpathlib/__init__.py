@@ -215,6 +215,30 @@ class RPath:
       else:
         raise RuntimeError(ret['error'])
 
+  async def a_copyfile(self, other):
+    if isinstance(other, str):
+      other_remote, _, other_path = re.match(r'''^((:?[^:"]+|"[^"]*")+:)?(.*)$''', other).groups()
+      if other_remote is None:
+        other_remote = self.remote
+      if other_path.startswith('/'):
+        other = RPath(other_path, other_remote)
+      else:
+        other = self.parent / pathlib.PurePath(other_path)
+    if not isinstance(other, RPath): raise NotImplementedError(type(other))
+    await RPath.a_client('operations/copyfile', srcFs=self._fs, srcRemote=self._remote, dstFs=other._fs, dstRemote=other._remote)
+
+  def copyfile(self, other):
+    if isinstance(other, str):
+      other_remote, _, other_path = re.match(r'''^((:?[^:"]+|"[^"]*")+:)?(.*)$''', other).groups()
+      if other_remote is None:
+        other_remote = self.remote
+      if other_path.startswith('/'):
+        other = RPath(other_path, other_remote)
+      else:
+        other = self.parent / pathlib.PurePath(other_path)
+    if not isinstance(other, RPath): raise NotImplementedError(type(other))
+    RPath.client('operations/copyfile', srcFs=self._fs, srcRemote=self._remote, dstFs=other._fs, dstRemote=other._remote)
+
   async def a_rename(self, other):
     if isinstance(other, str):
       other_remote, _, other_path = re.match(r'''^((:?[^:"]+|"[^"]*")+:)?(.*)$''', other).groups()
