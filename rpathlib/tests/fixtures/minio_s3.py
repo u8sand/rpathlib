@@ -58,7 +58,7 @@ def rpath():
   wait_for(functools.partial(safe_predicate, lambda: urlopen(Request(f"http://localhost:{port}/minio/health/live", method='HEAD')).status == 200))
   try:
     with rpathlib.with_rclone():
-      p = rpathlib.RPath(f":s3,provider=Minio,endpoint={json.dumps(f"http://localhost:{port}")},access_key_id={json.dumps(MINIO_ROOT_USER)},secret_access_key={json.dumps(MINIO_ROOT_PASSWORD)},directory_markers=true:")
+      p = rpathlib.RPath(f":s3,provider=Minio,endpoint={json.dumps(f'http://localhost:{port}')},access_key_id={json.dumps(MINIO_ROOT_USER)},secret_access_key={json.dumps(MINIO_ROOT_PASSWORD)},directory_markers=true:")
       (p/'test').mkdir()
       yield p/'test'
   finally:
