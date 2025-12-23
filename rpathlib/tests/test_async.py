@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 import rpathlib
 from rpathlib.tests.fixtures import a_rpath
 
@@ -8,8 +9,8 @@ async def test_async(a_rpath: rpathlib.RPath):
     await (a_rpath/'b').a_stat()
   await (a_rpath/'b').a_write_text('hi\n')
   assert await (a_rpath/'b').a_is_file()
-  # with a_rpath.mount() as p:
-  #   assert {'b'} == {f.name for f in p.iterdir()}, p
+  async with a_rpath.a_mount() as p:
+    assert {'b'} == {f.name for f in await asyncio.to_thread(lambda p=p: list(p.iterdir()))}, p
   # with (a_rpath/'b').open('rb+') as fh:
   #   assert fh.read() == b'hi\n'
   #   fh.seek(-1, 2)

@@ -125,24 +125,24 @@ class RPath:
     stat = self.stat()
     return not stat['IsDir']
 
-  # @contextlib.asynccontextmanager
-  # async def amount(self, mountPoint):
-  #   ret = await RPath.a_client('mount/mount', fs=str(self), mountPoint=mountPoint, vfsOpt=json.dumps({'CacheMode': 'writes', 'WriteBack': '100ms'}))
-  #   try:
-  #     yield mountPoint
-  #   finally:
-  #     while True:
-  #       ret = await RPath.a_client('vfs/stats', fs=str(self))
-  #       if ret['diskCache']['uploadsInProgress'] or ret['diskCache']['uploadsQueued']:
-  #         await asyncio.sleep(0.1)
-  #       else:
-  #         break
-  #     ret = await RPath.a_client('mount/unmount', mountPoint=mountPoint)
-
-  # @contextlib.contextmanager
-  # def mount(self, mountPoint):
-  #   with rpathlib.utils.with_awith(self.amount(mountPoint)):
-  #     yield
+  @contextlib.asynccontextmanager
+  async def a_mount(self, vfsOpt={'CacheMode': 'writes', 'WriteBack': '100ms'}):
+    '''
+    Use rclone to mount this, this effectively "promotes" the RPath to a temporary Path existing on your system by fuse mounting
+    '''
+    async with rpathlib.utils.awith_with(tempfile.TemporaryDirectory) as tmpdir:
+      ret = await RPath.a_client('mount/mount', fs=str(self), mountPoint=tmpdir, vfsOpt=json.dumps(vfsOpt))
+      try:
+        yield pathlib.Path(tmpdir)
+      finally:
+        while True:
+          ret = await RPath.a_client('vfs/stats', fs=str(self))
+          if ret['diskCache']['uploadsInProgress'] or ret['diskCache']['uploadsQueued']:
+            time.sleep(0.1)
+          else:
+            break
+        time.sleep(0.1)
+        await RPath.a_client('mount/unmount', mountPoint=tmpdir)
 
   @contextlib.contextmanager
   def mount(self, vfsOpt={'CacheMode': 'writes', 'WriteBack': '100ms'}):
