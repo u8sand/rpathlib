@@ -16,10 +16,10 @@ async def test_async(a_rpath: rpathlib.RPath):
   #   fh.seek(-1, 2)
   #   fh.write(b'!')
   assert await (a_rpath/'b').a_read_text() == 'hi\n'
-  assert {'b'} == {f async for f in a_rpath.a_iterdir()}
+  assert {'b'} == {f.name async for f in a_rpath.a_iterdir()}
   await (a_rpath/'b').a_rename('c')
   with pytest.raises(FileNotFoundError):
     await (a_rpath/'b').a_read_text()
-  assert {'c'} == {f async for f in a_rpath.a_iterdir()}
+  assert {'c'} == {f.name async for f in a_rpath.a_iterdir()}
   await (a_rpath/'c').a_unlink()
   assert not await (a_rpath/'c').a_exists()

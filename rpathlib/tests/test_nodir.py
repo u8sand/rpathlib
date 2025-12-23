@@ -14,10 +14,10 @@ def test_nodir(rpath: rpathlib.RPath):
     fh.seek(-1, 2)
     fh.write(b'!')
   assert (rpath/'b').read_text() == 'hi!'
-  assert {'b'} == set(rpath.iterdir())
+  assert {'b'} == {f.name for f in rpath.iterdir()}
   (rpath/'b').rename('c')
   with pytest.raises(FileNotFoundError):
     (rpath/'b').read_text()
-  assert {'c'} == set(rpath.iterdir())
+  assert {'c'} == {f.name for f in rpath.iterdir()}
   (rpath/'c').unlink()
   assert not (rpath/'c').exists()

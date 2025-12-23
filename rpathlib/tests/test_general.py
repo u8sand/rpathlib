@@ -15,7 +15,7 @@ def test_general(rpath: rpathlib.RPath):
     fh.seek(-1, 2)
     fh.write(b'!')
   assert (rpath/'b').read_text() == 'hi!'
-  assert {'a', 'b'} == set(rpath.iterdir())
+  assert {'a', 'b'} == {f.name for f in rpath.iterdir()}
   (rpath/'a').rmdir()
   with pytest.raises(FileNotFoundError):
     (rpath/'a').rmdir()
@@ -24,6 +24,6 @@ def test_general(rpath: rpathlib.RPath):
   # TODO: test rename to other remote
   with pytest.raises(FileNotFoundError):
     (rpath/'b').read_text()
-  assert {'c'} == set(rpath.iterdir())
+  assert {'c'} == {f.name for f in rpath.iterdir()}
   (rpath/'c').unlink()
   assert not (rpath/'c').exists()

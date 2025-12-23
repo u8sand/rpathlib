@@ -268,7 +268,7 @@ class RPath:
     ret = await RPath.a_client('operations/list', fs=self._fs, remote=self._remote, opt=json.dumps(dict(recurse=False, showHash=False)))
     try:
       for file in ret['list']:
-        yield file['Name']
+        yield self/file['Name']
     except KeyError:
       # TODO: handle other errors like client/server down
       raise FileNotFoundError(self.path)
@@ -278,7 +278,7 @@ class RPath:
     ret = RPath.client('operations/list', fs=self._fs, remote=self._remote, opt=json.dumps(dict(recurse=False, showHash=False)))
     try:
       for file in ret['list']:
-        yield file['Name']
+        yield self/file['Name']
     except KeyError:
       # TODO: handle other errors like client/server down
       raise FileNotFoundError(self.path)
